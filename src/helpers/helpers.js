@@ -64,11 +64,10 @@ hbs.registerHelper('listar', ()=>{
 	return texto;
 });
 
-hbs.registerHelper('listarCursosInteresado', (listado)=>{
-	listaCursos=listado
+hbs.registerHelper('listarCursosInteresado', (listaCursos)=>{
 	let texto= "<div class='accordion' id='accordionExample'>";
 	i=1
-	listaCursos.forEach(curso=> {if (curso.estado=="Disponible"){
+	listaCursos.forEach(curso=> {if (curso.estado=="abierto"){
 		texto=texto +
 			   `<div class="card">\
 			   			<div class="card-header" id="heading${i}">\
@@ -99,9 +98,9 @@ hbs.registerHelper('listarCursosInteresado', (listado)=>{
 hbs.registerHelper('listarCursosInteresadoSelect', (listaCursos)=>{
 	let texto= '<select style="width: 100%;" name="cursoSelect">';
 	i=1
-	listaCursos.forEach(curso=> {if (curso.estado=="Disponible"){
+	listaCursos.forEach(curso=> {if (curso.estado=="abierto"){
 		texto=texto +
-			   `<option value=${curso.nombre}>${curso.nombre}</option>`
+			   `<option value=${curso.identificador}>${curso.nombre}</option>`
 			  i=i+1;
 	}});
 	texto=texto+'</select>';

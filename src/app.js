@@ -5,7 +5,9 @@ const app = express();
 const path= require('path');
 //const hbs=require('hbs');
 const mongoose=require('mongoose');
+const uniqueValidator = require('mongoose-unique-validator');
 const bodyParser=require('body-parser');
+const session = require('express-session');
 const port = process.env.PORT || 3000;
 
 const funciones=require('./funciones');
@@ -16,6 +18,7 @@ const directoriopartial = path.join(__dirname, '../partials');
 const dirNode_modules = path.join(__dirname , '../node_modules')
 const dirViews = path.join(__dirname, '../templates/views')
 const dirPartials = path.join(__dirname, '../templates/partials')
+
 
 app.use(session({
   secret: 'keyboard cat',
@@ -29,6 +32,11 @@ app.use((req,res,next)=>{
 		res.locals.nombre=req.session.nombre
 		res.locals.tipo=req.session.tipo
 	}
+	if(req.session.tipo=="coordinador"){
+		res.locals.coordinador=true
+	}else if(req.session.tipo=="aspirante"){
+		res.locals.aspirante=true
+	}
 	next()
 })
 
@@ -41,7 +49,7 @@ app.use('/js', express.static(dirNode_modules + '/bootstrap/dist/js'));
 
 app.use(require('./routes/index'));
 
-mongoose.connect('mongodb://localhost:27017/terceraEntrega', {useNewUrlParser: true}, (err,result)=>{
+mongoose.connect('mongodb://localhost:27017/entrega3', {useNewUrlParser: true}, (err,result)=>{
 	if(err){
 		return console.log("Hubi error al comunicarse con la BD "+ error)
 	}

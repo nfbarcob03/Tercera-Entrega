@@ -30,30 +30,41 @@
 	  	<ul class="navbar-nav mr-auto">
 	  		<li class="nav-item">
 	    		<a class="nav-link"  href="/" role="tab" aria-controls="nav-home" aria-selected="true">Home</a>
+	    	</li>	
+
+
+	    	
+	    	{{#if aspirante}}
+	    	<li class="nav-item">
+	    		<a class="nav-link" href="/listar_cursos_usuario" role="tab" aria-controls="nav-profile" aria-selected="true">Cursos</a>
 	    	</li>
-	  		<li class="nav-item">
+	    	<li class="nav-item">
+	    		<a class="nav-link" href="/inscripcion_curso" role="tab" aria-controls="nav-profile" aria-selected="true">Inscripcion Curso</a>
+	    	</li>
+	    	{{/if}}
+
+	    	{{#if coordinador}}
+	    	<li class="nav-item">
+	    		<a class="nav-link" href="/listar_cursos_admin" role="tab" aria-controls="nav-profile" aria-selected="true">Cursos</a>
+	    	</li>
+	    	<li class="nav-item">
 	    		<a class="nav-link" href="/crearCursos" role="tab" aria-controls="nav-profile" aria-selected="true">Crear Curso</a>
-	    	</li>		
-	  		<li class="nav-item">
-	    		<a class="nav-link" href="/listar_cursos" role="tab" aria-controls="nav-profile" aria-selected="true">Cursos</a>
 	    	</li>
-			<li class="nav-item">
-	    		<a class="nav-link" href="/inscripcion" role="tab" aria-controls="nav-profile" aria-selected="true">Inscripcion</a>
-	    	</li>
-			<li class="nav-item">
+	    	<li class="nav-item">
 	    		 <a class="nav-link" href="/verInscriptos" role="tab" aria-controls="nav-profile" aria-selected="true">Ver Inscritos</a>
-	    	</li>
+	    	</li>	
 	    	<li class="nav-item">
 	    		 <a class="nav-link" href="/verusuarios" role="tab" aria-controls="nav-profile" aria-selected="true">Ver Usuarios</a>
 	    	</li>
-	    	
 	    	<li class="nav-item">
 	    		 <a class="nav-link" href="/actualizarCurso" role="tab" aria-controls="nav-profile" aria-selected="true">Modificar curso</a>
 	    	</li>
-	    	{{#if session}}	
+	    	{{/if}}
+	    {{#if session}}	
 	  		<li class="nav-item">
 	    		 <a class="nav-link" href="/actualizarUsuario" role="tab" aria-controls="nav-profile" aria-selected="true">Ver informacion de usuario</a>
 	    	</li>
+
 	   	</ul>
 		<form class="form-inline my-2 my-lg-0" action="/salir" method="get">
 			<h3>{{nombre}}</h3>
@@ -61,6 +72,9 @@
 		</form>
 
 		{{else}}
+		<li class="nav-item">
+	    		<a class="nav-link" href="/registro" role="tab" aria-controls="nav-profile" aria-selected="true">Registro</a>
+	    </li>
 		</ul>
 		<form class="form-inline my-2 my-lg-0" action="/ingresar" method="post">
 			<input class="fomr-control mr-sm-2" type="text" name="user" placeholder="Nombre de Usuario">
@@ -68,6 +82,7 @@
 			<button class="btn btn-primary my-2 my-sm-0" type="submit">Ingresar</button>
 		</form>
 		{{/if}}
+
  	</div>
 </nav>
 

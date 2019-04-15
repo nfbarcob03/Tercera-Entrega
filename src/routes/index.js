@@ -93,18 +93,30 @@ app.post('/ingresar', (req,res)=>{
 		req.session.nombre=result.nombre
 		req.session.tipo=result.tipo
 
+		if (result.tipo=="coordinador"){
+			req.session.coordinador=true
+			res.render('ingresar',{
+			mensaje:"Ingreso correcto. Bienvenido Admin "+ result.nombre,
+			session:true,
+			coordinador:true,
+			nombre:result.nombre
+		})
+		}else{
+			req.session.aspirante=true
+			res.render('ingresar',{
+			mensaje:"Ingreso correcto. Bienvenido ASpirante "+ result.nombre,
+			session:true,
+			aspirante:true,
+			nombre:result.nombre
+		})
+		}
+
 		//Session, se crea el token (para trabajar con jwt)
 		//let token=jwt.sign({
 		//	  data: result
 		//	}, 'tdea-nfbb', { expiresIn: '1h' });
 		//
 		//localStorage.setItem('token', token);
-
-		res.render('ingresar',{
-			mensaje:"Ingreso correcto. Bienvenido "+ result.nombre,
-			session:true,
-			nombre:result.nombre
-		})
 	})
 })
 
@@ -152,7 +164,7 @@ app.post('/actualizarCurso', (req,res)=>{
 		})
 		}
 		res.render('actualizarCurso',{
-			nombre:result.nombre,
+			nombreCurso:result.nombre,
 			identificador:result.identificador,
 			descripcion:result.descripcion,
 			valor:result.valor,
@@ -163,13 +175,13 @@ app.post('/actualizarCurso', (req,res)=>{
 	})
 })
 
-app.get('/inscripcion', (req, res)=>{
-	res.render('inscripcion', {
+app.get('/registro', (req, res)=>{
+	res.render('registro', {
 		titulo:'Inacribase a un curso de Educación Continua '
 		})
 })
 
-app.post('/inscribir', (req, res)=>{
+app.post('/registro', (req, res)=>{
 	let usuario= new Usuario({
 		nombre: req.body.nombre,
 		password:bcrypt.hashSync(req.body.password, salt),
@@ -272,12 +284,93 @@ app.get('/verInscriptos', (req,res)=>{
 })
 
 
-app.get('/listar_cursos', (req,res)=>{
+app.get('/listar_cursos_usuario', (req,res)=>{
 	Asignatura.find({}).exec((err,respuesta)=>{
 		if(err){
 			return console.log('Error con la BD: '+ err)
 		}
-		res.render('listar_cursos',{
+		res.render('listar_cursos_usuario',{
+		titulo:'Listado de Cursos',
+		listado:respuesta
+		})
+	})
+	
+})
+
+app.get('/inscripcion_curso', (req,res)=>{
+	let user=Usuario.findById(req.session.usuario,(err,user)=>{
+		if(err){
+			console.log("no se pudo conectar con la BD: "+ err)
+			return res.render('error',{
+			nombre:"Error, " + err.message,
+			titulo:"Error"
+			})
+		}
+		Asignatura.find({}).exec((err,respuesta)=>{
+		if(err){
+			return console.log('Error con la BD: '+ err)
+		}
+		res.render('inscripcion',{
+		titulo:'Listado de Cursos',
+		listado:respuesta,
+		nombre: user.nombre,
+		identificacion:user.identificacion,
+		correo:user.correo,
+		telefono:user.telefono
+		})
+	})
+	})
+})
+
+app.post('/inscribir', (req, res)=>{
+	estudiante= req.body.nombre;
+	identificacion=req.body.identificacion;
+	email=req.body.email;
+	telefono=req.body.telefono;
+	curso=req.body.cursoSelect;
+
+	Asignatura.findOne({ identificador:curso, estudiantes:identificacion}, (err,result)=>{
+		if(err){
+			console.log(err)
+		}
+		if(!result){
+		Asignatura.findOneAndUpdate({identificador:curso},{$push:{estudiantes:identificacion}},{new:true, runValidators: true, context: 'query'}, (err,result)=>{
+		if(err){
+			return res.render('error',{
+			nombre:"Error, " + err.message,
+			titulo:"Error"
+			})
+		}
+		if(!result){
+			return res.render('exitosa',{
+			mensaje:"No se ha encontrado ningun estudiante con ese nombre " + err
+		})
+		}
+		res.render('exitosa',{
+			mensaje:" Se ha inscrito al curso "+ result.nombre+ " con exito " +estudiante
+		})
+		})
+		}else{
+		res.render('error',{
+			mensaje:" ya existe en el curso el estudiante " +estudiante
+		})
+		}
+	})
+	//if(!existe){
+		
+	//}else{
+	//	res.render('error',{
+	//		mensaje:" ya existe en el curso el estudiante " +estudiante
+	//	})
+	//}
+})
+
+app.get('/listar_cursos_admin', (req,res)=>{
+	Asignatura.find({}).exec((err,respuesta)=>{
+		if(err){
+			return console.log('Error con la BD: '+ err)
+		}
+		res.render('listar_cursos_admin',{
 		titulo:'Listado de Cursos',
 		listado:respuesta
 		})

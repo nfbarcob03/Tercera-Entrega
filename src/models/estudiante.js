@@ -1,4 +1,5 @@
 const mongoose =require("mongoose");
+const uniqueValidator = require('mongoose-unique-validator');
 //Para ingresos a la BD unicos npm i mongoose-unique-validator
 //var uniqueValidator = require('mongoose-unique-validator');
 const Schema = mongoose.Schema;
@@ -17,7 +18,8 @@ const usuarioSchema =new Schema({
 	identificacion:{
 		type:String,
 		require:true,
-		trim:true
+		trim:true,
+		unique: true
 		},
 	correo:{
 		type:String,
@@ -37,6 +39,6 @@ const usuarioSchema =new Schema({
 });
 
 //Para ingresos a la BD unicos
-//usuarioSchema.plugin(uniqueValidator);
+usuarioSchema.plugin(uniqueValidator);
 const Usuario=mongoose.model('Usuario', usuarioSchema);
 module.exports=Usuario;
