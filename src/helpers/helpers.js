@@ -151,9 +151,8 @@ hbs.registerHelper('listarCursosAdmin', (listaCursos)=>{
 	return texto;
 });
 
-hbs.registerHelper('lista_inscritos', ()=>{
-	let texto="";
-	listaCursos=require('./listado_cursos.json');
+hbs.registerHelper('lista_inscritos', (listaCursos)=>{
+	console.log(listaCursos)
 	texto= "<div class='accordion' id='accordionExample'>";
 	i=1;
 	listaCursos.forEach(curso=> {
@@ -180,16 +179,15 @@ hbs.registerHelper('lista_inscritos', ()=>{
 				  </thead>\
 				  <tbody>';
 					try{
-					c=curso.nombre.split(' ');
-					listaUnCursos=require('../'+c[0]+'.json');
+					listaUnCursos=curso.estudiantes
 					if(listaUnCursos.length==0){
 						throw new Exception();
 					}
+					console.log(listaUnCursos)
 					listaUnCursos.forEach(est=> {
 						texto=texto +`
 							    <tr>
-							   
-							    	
+
 								    <th scope="row" >${est.identificacion}</th>
 							      	<td>${est.estudiante}</td>
 							      	<td >${est.email}</td>

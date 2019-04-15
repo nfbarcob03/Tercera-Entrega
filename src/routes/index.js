@@ -53,18 +53,38 @@ app.post('/eliminarEstudiante', (req, res)=>{
 	let email=req.body.email;
 	let telefono=req.body.tel;
 	let curso=req.body.curso;
-	let est={estudiante:estudiante, identificacion:identificacion.toString(), email:email, telefono:telefono, curso:curso};
-	let exito=funciones.eliminarEstudiante(est);
-	if(exito){
-		res.render('listadoInscritos',{
-		titulo:'Se ha eliminado el estudiante con Exito'
-	});
-	}else{
-		res.render('errorCurso',{
-		titulo:'Error'
-	});
-	}
-	
+
+	Asignatura.findOneAndUpdate({nombre:req.body.nombre},req.body,{new:true, runValidators: true, context: 'query'}, (err,result)=>{
+		if(err){
+			return res.render('error',{
+			nombre:"Error, " + err.message,
+			titulo:"Error"
+			})
+		}
+		if(!result){
+			return res.render('actualizar',{
+			nombre:"No se ha encontrado ningun estudiante con ese nombre"
+		})
+		}
+		res.render('actualizar',{
+			nombre:result.nombre,
+			matematicas:result.matematicas,
+			ingles: result.ingles,
+			programacion:result.programacion
+		})
+	})
+
+	//let est={estudiante:estudiante, identificacion:identificacion.toString(), email:email, telefono:telefono, curso:curso};
+	//let exito=funciones.eliminarEstudiante(est);
+	//if(exito){
+	//	res.render('listadoInscritos',{
+	//	titulo:'Se ha eliminado el estudiante con Exito'
+	//});
+	//}else{
+	//	res.render('errorCurso',{
+	//	titulo:'Error'
+	//});
+	//}	
 })
 
 app.get('/crearCursos', (req, res)=>{
@@ -263,23 +283,49 @@ app.post('/eliminarUsuario', (req,res)=>{
 })
 
 app.post('/cambioEstado', (req, res)=>{
-	idCurso=req.body.cursoSelect;
-	let creacionExitosa=funciones.cambiarCurso(idCurso)
-	if (creacionExitosa){
-		res.render('listar_cursos',{
-		titulo:'Listado de Cursos'
-	});
-	}else{
-  		res.render('errorCurso',{
-		titulo:'Error'
-	});
-	}
-	
+	var idCurso=req.body.cursoSelect;
+	var estadoActual=""
+	var nuevoEstado="" 
+
+	Asignatura.findOne({identificador:idCurso}, (err,result)=>{
+		estadoActual=result.estado
+		console.log(estadoActual)
+		if(estadoActual=="abierto"){
+			nuevoEstado="cerrado"
+		}else{
+			nuevoEstado="abierto"
+		}
+		console.log(idCurso)
+		console.log(nuevoEstado)
+		Asignatura.findOneAndUpdate({identificador:idCurso},{$set:{estado:nuevoEstado}},{new:true, runValidators: true, context: 'query'}, (err,result)=>{
+			if(err){
+				return res.render('error',{
+				nombre:"Error, " + err.message,
+				titulo:"Error"
+				})
+			}
+			if(!result){
+				return res.render('actualizarUsuario',{
+				nombre:"No se ha encontrado ningun estudiante con ese nombre " + err
+			})
+			}
+			res.render('exitosa',{
+				nombre:"Exito!",
+				mensaje:"Actualizacion Exitosa"
+			})
+		})
+	})
 })
 
-app.get('/verInscriptos', (req,res)=>{
-	res.render('listadoInscritos',{
-		titulo:'Listado de los Cursos'
+app.get('/verInscritos', (req,res)=>{
+	Asignatura.find({}).exec((err,respuesta)=>{
+		if(err){
+			return console.log('Error con la BD: '+ err)
+		}
+		res.render('listadoInscritos',{
+		titulo:'Listado de Cursos',
+		listado:respuesta
+		})
 	})
 })
 
@@ -334,7 +380,7 @@ app.post('/inscribir', (req, res)=>{
 			console.log(err)
 		}
 		if(!result){
-		Asignatura.findOneAndUpdate({identificador:curso},{$push:{estudiantes:identificacion}},{new:true, runValidators: true, context: 'query'}, (err,result)=>{
+		Asignatura.findOneAndUpdate({identificador:curso},{$push:{estudiantes:{estudiante,identificacion,email,telefono,curso}}},{new:true, runValidators: true, context: 'query'}, (err,result)=>{
 		if(err){
 			return res.render('error',{
 			nombre:"Error, " + err.message,

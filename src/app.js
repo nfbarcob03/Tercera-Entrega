@@ -49,11 +49,11 @@ app.use('/js', express.static(dirNode_modules + '/bootstrap/dist/js'));
 
 app.use(require('./routes/index'));
 
-mongoose.connect('mongodb://localhost:27017/entrega3', {useNewUrlParser: true}, (err,result)=>{
+mongoose.connect(process.env.URLDB, {useNewUrlParser: true}, (err,result)=>{
 	if(err){
-		return console.log("Hubi error al comunicarse con la BD "+ error)
+		return console.log("Error al conectarse a Mongoose" + err);
 	}
-	console.log("Conectado")
+		console.log("Conectado")
 });
 
 app.listen(process.env.PORT,()=>{
