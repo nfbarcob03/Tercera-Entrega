@@ -52,27 +52,26 @@ app.post('/eliminarEstudiante', (req, res)=>{
 	let estudiante=req.body.nombre;
 	let email=req.body.email;
 	let telefono=req.body.tel;
-	let curso=req.body.curso;
-
-	Asignatura.findOneAndUpdate({nombre:req.body.nombre},req.body,{new:true, runValidators: true, context: 'query'}, (err,result)=>{
+	let cursoIdentificador=req.body.curso_id;
+	console.log(cursoIdentificador +' '+ estudiante)
+	Asignatura.findOneAndUpdate({'identificador':cursoIdentificador,'estudiantes': {$elemMatch: {'estudiante':estudiante}}}, {'$pull': {'estudiantes': {'estudiante':estudiante}}},{new:true, runValidators: true, context: 'query'},(err,result)=>{
 		if(err){
 			return res.render('error',{
-			nombre:"Error, " + err.message,
+			mensaje:"Error, " + err.message,
 			titulo:"Error"
 			})
 		}
 		if(!result){
-			return res.render('actualizar',{
-			nombre:"No se ha encontrado ningun estudiante con ese nombre"
+			return res.render('error',{
+			mensaje:"No se ha encontrado ningun estudiante con ese nombre"
 		})
 		}
-		res.render('actualizar',{
-			nombre:result.nombre,
-			matematicas:result.matematicas,
-			ingles: result.ingles,
-			programacion:result.programacion
+		res.render('exitosa',{
+			mensaje:"Se ha eliminado el estudiante"
 		})
 	})
+
+
 
 	//let est={estudiante:estudiante, identificacion:identificacion.toString(), email:email, telefono:telefono, curso:curso};
 	//let exito=funciones.eliminarEstudiante(est);
@@ -167,11 +166,19 @@ app.post('/crearCurso', (req, res)=>{
 })
 
 app.get('/actualizarCurso', (req,res)=>{
-		res.render('actualizarCurso')
+	Asignatura.find({}).exec((err,respuesta)=>{
+		if(err){
+			return console.log('Error con la BD: '+ err)
+		}
+		res.render('actualizarCurso',{
+		titulo:'Actualizar cursos',
+		listado:respuesta
+		})
+	})
 })
 
 app.post('/actualizarCurso', (req,res)=>{
-	Asignatura.findOneAndUpdate({nombre:req.body.nombre},req.body,{new:true, runValidators: true, context: 'query'}, (err,result)=>{
+	Asignatura.findOneAndUpdate({identificador:req.body.identificador},req.body,{new:true, runValidators: true, context: 'query'}, (err,result)=>{
 		if(err){
 			return res.render('error',{
 			mensaje:"Error, " + err.message,
@@ -179,18 +186,13 @@ app.post('/actualizarCurso', (req,res)=>{
 			})
 		}
 		if(!result){
-			return res.render('actualizarCurso',{
-			nombre:"No se ha encontrado ningun estudiante con ese nombre " + err
+			return res.render('error',{
+			mensaje:"No se puede cambiar el id del curso " + err
 		})
 		}
-		res.render('actualizarCurso',{
-			nombreCurso:result.nombre,
-			identificador:result.identificador,
-			descripcion:result.descripcion,
-			valor:result.valor,
-			modalidad:result.modalidad,
-			intensidad:result.intensidad,
-			estado:result.estado
+		res.render('actualizarCurso2',{
+			titulo: "Actualizacion exitosa",
+			curso:result
 		})
 	})
 })
@@ -316,6 +318,29 @@ app.post('/cambioEstado', (req, res)=>{
 		})
 	})
 })
+
+app.post('/listaActualizarCursos', (req, res)=>{
+	var idCurso=req.body.cursoSelect;
+
+	Asignatura.findOne({identificador:idCurso}, (err,result)=>{
+			if(err){
+				return res.render('error',{
+				mensaje:"Error, " + err.message,
+				titulo:"Error"
+				})
+			}
+			if(!result){
+				return res.render('error',{
+				mensaje:"No se ha encontrado ningun estudiante con ese nombre " + err
+			})
+			}
+			curso=result
+			res.render('actualizarCurso2',{
+				titulo:"Actualizar Curso",
+				curso:curso
+			})
+		})
+	})
 
 app.get('/verInscritos', (req,res)=>{
 	Asignatura.find({}).exec((err,respuesta)=>{

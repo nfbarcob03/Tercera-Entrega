@@ -119,6 +119,19 @@ hbs.registerHelper('lista_curso_estado', (listaCursos)=>{
 	return texto;
 });
 
+hbs.registerHelper('lista_curso_actualizar', (listaCursos)=>{
+	let texto= '<select style="width: 100%;" name="cursoSelect">';
+	i=1
+	listaCursos.forEach(curso=> {
+		texto=texto +
+			   `<label>Escoja el curso a actualizar</label>
+			   <option value=${curso.identificador}>${curso.nombre})</option>`
+			  i=i+1;
+	});
+	texto=texto+'</select>';
+	return texto;
+});
+
 hbs.registerHelper('listarCursosAdmin', (listaCursos)=>{
 	let texto= '<table class="table">\
   <thead>\
@@ -174,7 +187,7 @@ hbs.registerHelper('lista_inscritos', (listaCursos)=>{
 				      <th scope="col">Nombre</th>\
 				      <th scope="col">Email</th>\
 				      <th scope="col">Telefono</th>\
-				      <th scope="col">Eliminar</th>\
+				      <th scope="col"></th>\
 				    </tr>\
 				  </thead>\
 				  <tbody>';
@@ -194,6 +207,7 @@ hbs.registerHelper('lista_inscritos', (listaCursos)=>{
 							      	<td>${est.telefono}</td>
 							    <form action="/eliminarEstudiante" method="post">
 							      	<input type="hidden" name="curso" value="${curso.nombre}">
+							      	<input type="hidden" name="curso_id" value="${curso.identificador}">
 								    <input type="hidden" name="identificacion" value="${est.identificacion}">
 							      	<input type="hidden" name="email" value="${est.email}">
 								    <input type="hidden" name="nombre" value="${est.estudiante}">
